@@ -231,31 +231,27 @@ python scripts/download_skills.py
 #!/bin/bash
 
 SKILL_ID=1
-SKILL_FILE="skills/edit-name/SKILL.md"
+SKILL_DIR="skills/edit-name"
 SERVER="https://review-test.qa.svc.vkusvill.ru"
 
-# Разбираем YAML frontmatter (через Python)
-python3 << EOF
-import re, yaml, sys, json
+# Извлекаем name, description из YAML frontmatter
+name=$(grep '^name:' "$SKILL_DIR/SKILL.md" | cut -d':' -f2 | xargs)
+desc=$(grep '^description:' "$SKILL_DIR/SKILL.md" | cut -d':' -f2- | xargs)
 
-with open('$SKILL_FILE') as f:
-    content = f.read()
+# Извлекаем instruction — всё после второго --- (без YAML frontmatter)
+instruction=$(awk 'BEGIN{f=0} /^---$/{f++; if(f==2){next}} f==2{print}' "$SKILL_DIR/SKILL.md")
 
-match = re.match(r'^---\n(.*?)\n---\n(.*)$', content, re.DOTALL)
-if match:
-    frontmatter = yaml.safe_load(match.group(1))
-    instruction = match.group(2).strip()
-else:
-    frontmatter = {"name": "unknown", "description": ""}
-    instruction = content
-
-print(json.dumps({
-    "name": frontmatter.get("name"),
-    "description": frontmatter.get("description"),
-    "instruction": instruction
-}))
-EOF
+# Загружаем через API
+jq -n \
+  --arg name "$name" \
+  --arg desc "$desc" \
+  --arg instr "$instruction" \
+  '{name: $name, description: $desc, instruction: $instr}' | \
+curl -X PUT "$SERVER/api/skills/$SKILL_ID" \
+    -H "Content-Type: application/json" -d @-
 ```
+
+**ВАЖНО:** `instruction` должен содержать **только** содержимое после YAML frontmatter. Не включай `---` и YAML-поля в instruction!
 
 ### Обновление промпта из файла
 

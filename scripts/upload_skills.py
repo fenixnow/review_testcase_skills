@@ -18,28 +18,43 @@ SKILLS_DIR = "skills"
 def parse_skill_file(filepath):
     """Разбирает SKILL.md на компоненты для API."""
     with open(filepath, 'r', encoding='utf-8') as f:
-        content = f.read()
+        lines = f.readlines()
 
-    # Извлекаем YAML frontmatter
-    match = re.match(r'^---\n(.*?)\n---\n(.*)$', content, re.DOTALL)
+    # Находим границы YAML frontmatter
+    frontmatter_start = -1
+    frontmatter_end = -1
 
-    if match:
-        frontmatter_text = match.group(1)
-        instruction_body = match.group(2).strip()
-        frontmatter = yaml.safe_load(frontmatter_text)
+    for i, line in enumerate(lines):
+        if line.strip() == '---':
+            if frontmatter_start == -1:
+                frontmatter_start = i + 1  # Строка после первого ---
+            else:
+                frontmatter_end = i  # Строка второго ---
+                break
+
+    # Извлекаем name и description простым grep (без yaml.safe_load)
+    name = None
+    description = None
+
+    if frontmatter_start >= 0 and frontmatter_end > frontmatter_start:
+        for i in range(frontmatter_start, frontmatter_end):
+            line = lines[i]
+            if line.startswith('name:'):
+                name = line.split(':', 1)[1].strip()
+            elif line.startswith('description:'):
+                description = line.split(':', 1)[1].strip()
+
+        instruction_body = ''.join(lines[frontmatter_end + 1:]).strip()
     else:
-        # Если нет frontmatter — используем имя папки
-        frontmatter = {
-            "name": filepath.parent.name,
-            "description": ""
-        }
-        instruction_body = content.strip()
+        # Если нет frontmatter
+        name = filepath.parent.name.replace('-', '_')
+        description = ""
+        instruction_body = ''.join(lines).strip()
 
     return {
-        "name": frontmatter.get("name"),
-        "description": frontmatter.get("description"),
-        "instruction": instruction_body,
-        "tags": frontmatter.get("tags")
+        "name": name,
+        "description": description,
+        "instruction": instruction_body
     }
 
 
