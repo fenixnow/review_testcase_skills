@@ -8,8 +8,11 @@
 import os
 import requests
 from pathlib import Path
+from dotenv import load_dotenv
 
-SERVER = "https://review-test.qa.svc.vkusvill.ru"
+# Загружаем переменные окружения из .env
+load_dotenv(dotenv_path=Path(__file__).parent.parent / ".env")
+SERVER = os.getenv("REVIEW_SERVER")
 PROMPTS_DIR = "prompts"
 
 

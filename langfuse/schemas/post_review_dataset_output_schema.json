@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "properties": {
+    "testcase_status_changed": {
+      "type": "boolean",
+      "description": "Был ли изменён статус тест-кейса"
+    },
+    "testcase_status_id": {
+      "type": "integer",
+      "description": "Новый статус (если был изменён)"
+    },
+    "comment_published": {
+      "type": "boolean",
+      "description": "Был ли опубликован комментарий"
+    }
+  },
+  "required": ["testcase_status_changed", "comment_published"]
+}

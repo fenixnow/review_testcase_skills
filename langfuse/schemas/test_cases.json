@@ -1,0 +1,60 @@
+[
+  {
+    "input": {
+      "testcase_id": "80719",
+      "review_result": "1. Имя тест-кейса\n   - Название слишком длинное\n\nПредлагаемые правки:\n1. Имя тест-кейса\n   - Изменить имя на: «Создание достижения»"
+    },
+    "expected_output": {
+      "status_changed": true,
+      "new_status": "Требует актуализации",
+      "comment_published": true
+    },
+    "metadata": {
+      "category": "with_issues",
+      "expected_status_change": true
+    }
+  },
+  {
+    "input": {
+      "testcase_id": "80720",
+      "review_result": "Тест-кейс проверен, замечаний нет."
+    },
+    "expected_output": {
+      "status_changed": false,
+      "comment_published": true
+    },
+    "metadata": {
+      "category": "without_issues",
+      "expected_status_change": false
+    }
+  },
+  {
+    "input": {
+      "testcase_id": "80721",
+      "review_result": ""
+    },
+    "expected_output": {
+      "status_changed": false,
+      "comment_published": true
+    },
+    "metadata": {
+      "category": "empty_review",
+      "expected_status_change": false
+    }
+  },
+  {
+    "input": {
+      "testcase_id": "80722",
+      "review_result": "1. Имя тест-кейса\n   - Замечание\n\nПредлагаемые правки:\n(все выполнено)\n\n## Исправлено автоматически\n- 1. Имя тест-кейса → изменено"
+    },
+    "expected_output": {
+      "status_changed": false,
+      "comment_published": true,
+      "all_fixed": true
+    },
+    "metadata": {
+      "category": "auto_fixed",
+      "expected_status_change": false
+    }
+  }
+]

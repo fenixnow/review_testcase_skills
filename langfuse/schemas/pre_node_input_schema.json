@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "properties": {
+    "testcase_id": {
+      "type": "integer",
+      "description": "ID тест-кейса в Allure TestOps"
+    },
+    "project_id": {
+      "type": ["integer", "null"],
+      "description": "ID проекта"
+    },
+    "edit_testcase_enabled": {
+      "type": "boolean",
+      "description": "Включено редактирование тест-кейса"
+    },
+    "post_processing_enabled": {
+      "type": "boolean",
+      "description": "Включена пост-обработка"
+    }
+  },
+  "required": ["testcase_id"]
+}

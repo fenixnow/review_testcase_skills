@@ -10,10 +10,15 @@
 """
 
 import sys
+import os
 import requests
 import argparse
+from pathlib import Path
+from dotenv import load_dotenv
 
-SERVER = "https://review-test.qa.svc.vkusvill.ru"
+# Загружаем переменные окружения из .env
+load_dotenv(dotenv_path=Path(__file__).parent.parent / ".env")
+SERVER = os.getenv("REVIEW_SERVER")
 
 
 def submit_review(testcase_id, project_id=None, edit_testcase_enabled=True, post_processing_enabled=True, review_id=None):

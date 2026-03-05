@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "properties": {
+    "testcase_id": {
+      "type": "string",
+      "description": "ID тест-кейса в Allure TestOps"
+    },
+    "review_result": {
+      "type": "string",
+      "description": "Текст ревью с замечаниями и правками"
+    }
+  },
+  "required": ["testcase_id", "review_result"]
+}

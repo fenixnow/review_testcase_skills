@@ -1,0 +1,50 @@
+{
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "integer",
+      "description": "ID проекта"
+    },
+    "review_prompt": {
+      "type": "string",
+      "description": "Промпт для ревью тест-кейса"
+    },
+    "edit_testcase_prompt": {
+      "type": "string",
+      "description": "Промпт для применения правок"
+    },
+    "post_prompt": {
+      "type": "string",
+      "description": "Промпт для пост-обработки"
+    },
+    "skills": {
+      "type": "array",
+      "description": "Список доступных скиллов",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "description": {"type": "string"},
+          "instruction": {"type": "string"},
+          "tags": {"type": "array", "items": {"type": "string"}},
+          "id": {"type": "integer"},
+          "parameters": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {"type": "string"},
+                "type": {"type": "string"},
+                "description": {"type": "string"},
+                "required": {"type": "boolean"},
+                "id": {"type": "integer"},
+                "skill_id": {"type": "integer"}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": ["project_id"]
+}

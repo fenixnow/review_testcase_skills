@@ -1,0 +1,36 @@
+{
+  "type": "object",
+  "properties": {
+    "success": {
+      "type": "boolean",
+      "description": "Успешно ли применены правки"
+    },
+    "applied_changes": {
+      "type": "array",
+      "description": "Список применённых изменений",
+      "items": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string",
+            "description": "Какое поле было изменено"
+          },
+          "old_value": {
+            "type": "string",
+            "description": "Старое значение"
+          },
+          "new_value": {
+            "type": "string",
+            "description": "Новое значение"
+          }
+        }
+      }
+    },
+    "errors": {
+      "type": "array",
+      "description": "Ошибки при применении правок",
+      "items": {"type": "string"}
+    }
+  },
+  "required": ["success"]
+}

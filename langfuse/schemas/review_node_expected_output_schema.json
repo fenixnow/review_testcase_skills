@@ -1,0 +1,35 @@
+{
+  "type": "object",
+  "properties": {
+    "has_issues": {
+      "type": "boolean",
+      "description": "Есть ли замечания к тест-кейсу"
+    },
+    "issues": {
+      "type": "array",
+      "description": "Список замечаний",
+      "items": {
+        "type": "object",
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": ["critical", "major", "minor"]
+          },
+          "field": {
+            "type": "string",
+            "description": "Какое поле затронуто (name, description, steps, etc.)"
+          },
+          "issue": {
+            "type": "string",
+            "description": "Описание проблемы"
+          },
+          "suggestion": {
+            "type": "string",
+            "description": "Предложение по исправлению"
+          }
+        }
+      }
+    }
+  },
+  "required": ["has_issues"]
+}

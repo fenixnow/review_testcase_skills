@@ -2,19 +2,18 @@
 
 # Входные данные
 
-**testcase_id:**
-<TESTCASE_ID>
-{testcase_id}
-</TESTCASE_ID>
+<testcase_id>
+{{testcase_id}}
+</testcase_id>
 
-**review_result:**
-<REVIEW_RESULT>
-{review_result}
-</REVIEW_RESULT>
+<review_result>
+{{review_result}}
+
+</review_result>
 
 ---
 
-**Алгоритм действий:**
+# Алгоритм действий:
 
 1. **Валидация ID:** Перед публикацией убедитесь, что идентификатор тест-кейса `testcase_id` является корректным и существующим в системе.
 2. **Публикация комментария:** Опубликуйте текст из блока `review_result` к указанному тест-кейсу.

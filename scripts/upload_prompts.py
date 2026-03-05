@@ -2,31 +2,39 @@
 """
 Скрипт для загрузки промптов на удалённый сервер.
 
-Считывает .md файлы из директории prompts/ и отправляет в API.
+Использование:
+    python3 scripts/upload_prompts.py <filename>
+
+Пример:
+    python3 scripts/upload_prompts.py review.md
 """
 
 import os
+import sys
 import requests
+import argparse
 from pathlib import Path
+from dotenv import load_dotenv
 
-SERVER = "https://review-test.qa.svc.vkusvill.ru"
+# Загружаем переменные окружения из .env
+load_dotenv(dotenv_path=Path(__file__).parent.parent / ".env")
+SERVER = os.getenv("REVIEW_SERVER")
 PROMPTS_DIR = "prompts"
 
-# Соответствие локальных файлов ID промптов на сервере
+# Соответствие локальных файлов ID промптов на сервере (из .env)
 PROMPT_MAPPING = {
-    "edit_testcase.md": 45,      # Полетаев - Редактирование
-    "review.md": 46,              # Полетаев - Ревью 2
-    "post_review.md": 51,              # Публикация комментария и изменения статуса
+    "edit_testcase.md": os.getenv("PROMPT_EDIT_TESTCASE_ID"),
+    "review.md": os.getenv("PROMPT_REVIEW_ID"),
+    "post_review.md": os.getenv("PROMPT_POST_REVIEW_ID")
 }
+# Удаляем None значения (если переменная не задана в .env)
+PROMPT_MAPPING = {k: v for k, v in PROMPT_MAPPING.items() if v is not None}
 
 # Соответствие имён файлов видам промптов (PromptKind) для новых
 PROMPT_KINDS = {
     "edit_testcase.md": "EDIT_TESTCASE",
-    "review_simple_1.md": "RUN_REVIEW",
-    "review_t.md": "RUN_REVIEW",
-    "review_full.md": "RUN_REVIEW",
-    "publish_results.md": "PUBLISH_REVIEW_RESULTS",
-    "comment_t.md": "PUBLISH_REVIEW_RESULTS",
+    "review.md": "RUN_REVIEW",
+    "post_review.md": "PUBLISH_REVIEW_RESULTS"
 }
 
 
@@ -71,40 +79,44 @@ def create_prompt(prompt_data):
     return response.json()
 
 
-def upload_all_prompts():
-    """Загружает все промпты на сервер."""
+def upload_prompt_file(filename):
+    """Загружает конкретный промпт на сервер."""
     prompts_path = Path(PROMPTS_DIR)
+    prompt_file = prompts_path / filename
 
-    if not prompts_path.exists():
-        print(f"❌ Директория {PROMPTS_DIR} не найдена")
-        return
+    if not prompt_file.exists():
+        print(f"❌ Файл {filename} не найден")
+        sys.exit(1)
 
-    # Получаем список существующих промптов (для информации)
-    try:
-        existing = requests.get(f"{SERVER}/api/prompts").json()
-        print(f"📋 На сервере {len(existing)} промптов")
-    except requests.RequestException as e:
-        print(f"⚠️  Не удалось получить список промптов: {e}")
+    # Пропускаем system.md - не публикуем
+    if filename == "system.md":
+        print("⚠️  system.md не публикуется")
+        sys.exit(1)
 
-    for prompt_file in sorted(prompts_path.glob("*.md")):
-        filename = prompt_file.name
+    # Разбираем промпт
+    data = parse_prompt_file(prompt_file)
 
-        # Разбираем промпт
-        data = parse_prompt_file(prompt_file)
+    # Проверяем маппинг
+    if filename in PROMPT_MAPPING:
+        # Обновляем существующий по ID
+        prompt_id = PROMPT_MAPPING[filename]
+        print(f"🔄 Обновляем: {filename} → ID {prompt_id}")
+        result = upload_prompt(prompt_id, data)
+        print(f"   ✅ {result['name']} (ID: {result['id']})")
+    else:
+        # Создаём новый
+        print(f"➕ Создаём: {filename}")
+        result = create_prompt(data)
+        print(f"   ✅ {result['name']} (ID: {result['id']})")
 
-        # Проверяем маппинг
-        if filename in PROMPT_MAPPING:
-            # Обновляем существующий по ID
-            prompt_id = PROMPT_MAPPING[filename]
-            print(f"🔄 Обновляем: {filename} → ID {prompt_id}")
-            result = upload_prompt(prompt_id, data)
-            print(f"   ✅ {result['name']} (ID: {result['id']})")
-        else:
-            # Создаём новый (или пробуем найти по имени)
-            print(f"➕ Создаём: {filename}")
-            result = create_prompt(data)
-            print(f"   ✅ {result['name']} (ID: {result['id']})")
+
+def main():
+    parser = argparse.ArgumentParser(description="Загрузить промпт на сервер")
+    parser.add_argument("filename", help="Имя файла промпта (например: review.md)")
+    args = parser.parse_args()
+
+    upload_prompt_file(args.filename)
 
 
 if __name__ == "__main__":
-    upload_all_prompts()
+    main()
