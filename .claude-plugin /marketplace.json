@@ -24,7 +24,6 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./skills/testcase-review",
         "./skills/testops-edit-testcase"
       ]
     }
