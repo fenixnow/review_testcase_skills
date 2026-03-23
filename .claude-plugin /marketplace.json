@@ -1,17 +1,16 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "vkusvill-test-skills",
+  "description": "Набор скиллов для ревью и редактирования тест-кейсов в Allure TestOps",
   "owner": {
     "name": "Andrey Poletaev",
     "email": "a.poletaev@automacon.ru"
   },
-  "metadata": {
-    "description": "Skills for tests",
-    "version": "0.1.0"
-  },
   "plugins": [
     {
       "name": "tests-skills",
-      "description": "Коллекция скилов для написания автотестов",
+      "description": "Коллекция скиллов для написания автотестов на основе Swagger спецификаций",
+      "category": "development",
       "source": "./",
       "strict": false,
       "skills": [
@@ -20,7 +19,8 @@
     },
     {
       "name": "test-case-skills",
-      "description": "",
+      "description": "Набор скиллов для ревью тест-кейсов и автоматического редактирования в Allure TestOps",
+      "category": "development",
       "source": "./",
       "strict": false,
       "skills": [
