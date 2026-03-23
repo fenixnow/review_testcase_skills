@@ -1,0 +1,32 @@
+{
+  "name": "vkusvill-test-skills",
+  "owner": {
+    "name": "Andrey Poletaev",
+    "email": "a.poletaev@automacon.ru"
+  },
+  "metadata": {
+    "description": "Skills for tests",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "tests-skills",
+      "description": "Коллекция скилов для написания автотестов",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/tests-api-swagger"
+      ]
+    },
+    {
+      "name": "test-case-skills",
+      "description": "",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/testcase-review",
+        "./skills/testops-edit-testcase"
+      ]
+    }
+  ]
+}
