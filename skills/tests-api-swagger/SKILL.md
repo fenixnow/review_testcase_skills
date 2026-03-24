@@ -1,6 +1,6 @@
 ---
 name: api-tests-swagger
-description: "Напиши API тесты на Java/JUnit 5 используя сгенерированные OpenAPI клиенты. ВСЕГДА используй для: написать API тест, создать автотест REST endpoint, проверить HTTP метод, протестировать API, написать swagger тест, покрыть API тестами, integration тест REST API, добавить автотесты, проверить endpoint через executeAs(), использовать типизированные модели из lk3.model, Builder паттерн, JUnit Assertions вместо RestAssured body(). Если пользователь упоминает REST API, OpenAPI, Swagger, HTTP GET/POST/PUT/DELETE, автотесты API — используй этот навык."
+description: "Напиши API тесты на Java/JUnit 5 используя сгенерированные OpenAPI клиенты. Используй для: написать API тест, создать автотест REST endpoint, проверить HTTP метод, протестировать API, написать swagger тест, покрыть API тестами, integration тест REST API, добавить автотесты, написать тест по тест-кейсу из Allure TestOps. Если пользователь упоминает REST API, OpenAPI, Swagger, HTTP GET/POST/PUT/DELETE, автотесты API — используй этот навык."
 ---
 
 # API Тесты на Java с OpenAPI
@@ -39,6 +39,36 @@ public class SomeTests extends BaseTest {
 - Добавляет `@Layer(LayerType.API)` — слой тестирования
 - Добавляет `@ExtendWith(AllureJunit5.class)` — интеграция с Allure
 
+## Импорты
+
+```java
+// Статические импорты для шагов Allure и утверждений
+import static io.qameta.allure.Allure.step;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+// Импорты аннотаций
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+import io.qameta.allure.junit5.AllureJunit5;
+import io.qameta.allure.AllureId;  // Для связки с тест-кейсами TestOps
+
+// Импорты API клиентов и моделей
+import lk3.api.UserApi;
+import lk3.model.GetUser200Response;
+```
+
+**ВАЖНО:** `step()` — это **статический импорт** от `io.qameta.allure.Allure`, не `Allure.step()`.
+
+```java
+// ПРАВИЛЬНО
+step("Дано ID пользователя: %s".formatted(userId));
+
+// НЕПРАВИЛЬНО
+Allure.step("Дано ID пользователя: %s".formatted(userId));  // ❌
+```
+
 ## Quick Start
 
 ```java
@@ -51,7 +81,8 @@ GetUser200Response result = userApi()
         .statusCode(200)
         .extract().response());
 
-assertEquals("success", result.getStatus());
+assertEquals("success", result.getStatus(),
+    "Статус ответа должен быть 'success'");
 ```
 
 **Как работает executeAs():**
@@ -59,6 +90,17 @@ assertEquals("success", result.getStatus());
 - Внутри lambda мы цепочим `.then().statusCode(200).extract().response()`
 - **Метод САМ десериализует ответ** в тип `GetUser200Response`
 - Не используй `.body().as()` внутри executeAs!
+
+### Quick Start: Написание автотеста по тест-кейсу
+
+Когда пользователь просит написать API тест **по тест-кейсу** из Allure TestOps:
+
+1. Скопируй ID → добавь `@AllureId("ID")`
+2. Проанализируй **preconditions** → определи RequestSpec и заголовки
+3. Выпиши ВСЕ параметры из шага → сопоставь с методами API
+4. Напиши код → используй executeAs() для успешных ответов
+
+**⚠️ Критично:** Не пропускай preconditions! Подробно → [references/testcases.md](references/testcases.md)
 
 ## Паттерны
 
@@ -126,10 +168,15 @@ SaveInclusionAnswerRequest request = SaveInclusionAnswerRequest.builder()
 
 Используй JUnit Assertions вместо RestAssured `.body()` — типизированная модель уже десериализована, работай с ней напрямую.
 
+**⚠️ Важно:** Всегда добавляй message параметр для понятных ошибок (см. раздел [Проверки](#проверки)).
+
 ```java
-assertEquals("success", result.getStatus());
-assertNotNull(result.getBody().getData());
-assertTrue(result.getBody().getUsers().isEmpty());
+assertEquals("success", result.getStatus(),
+    "Статус ответа должен быть 'success'");
+assertNotNull(result.getBody().getData(),
+    "Поле 'data' не должно быть null");
+assertTrue(result.getBody().getUsers().isEmpty(),
+    "Список пользователей должен быть пустым");
 ```
 
 ### Логируй шаги через step()
@@ -149,8 +196,10 @@ GetUser200Response result = userApi()
         .extract().response());
 
 step("И я проверяю тело ответа", () -> {
-    assertEquals("success", result.getStatus());
-    assertNotNull(result.getBody());
+    assertEquals("success", result.getStatus(),
+        "Статус ответа должен быть 'success'");
+    assertNotNull(result.getBody(),
+        "Тело ответа не должно быть null");
 });
 ```
 
@@ -165,6 +214,7 @@ step("И я проверяю тело ответа", () -> {
 @Test
 @DisplayName("Получение пользователя по ID")  // Описание действия, без HTTP метода
 @Tag("api")
+@AllureId("12345")  // ОБЯЗАТЕЛЬНО при генерации по тест-кейсу TestOps
 void getUserById() {
     // Подготовка
     Long userId = 1L;
@@ -180,10 +230,58 @@ void getUserById() {
 
     // Проверки
     step("И я проверяю тело ответа", () -> {
-        assertEquals("success", result.getStatus());
+        assertEquals("success", result.getStatus(),
+            "Статус ответа должен быть 'success'");
     });
 }
 ```
+
+**⚠️ ПРАВИЛО @AllureId:**
+
+При генерации теста **по тест-кейсу из Allure TestOps** — ОБЯЗАТЕЛЬНО добавь `@AllureId` с ID тест-кейса:
+
+```java
+import io.qameta.allure.AllureId;
+
+@Test
+@DisplayName("Название из тест-кейса")
+@AllureId("72456")  // ID тест-кейса из TestOps
+void testFromTestcase() {
+    // ...
+}
+```
+
+**Зачем нужно:**
+- Связывает автотест с тест-кейсом в Allure TestOps
+- Позволяет видеть результаты автотестов в тест-кейсе
+- Обеспечивает трассировку от тест-кейса до автотеста
+
+**Когда НЕ добавлять:**
+- Если пишешь тест не по конкретному тест-кейсу
+- Если это пример/демо код
+- Если тест не связан с TestOps
+
+
+## Работа с тест-кейсами Allure TestOps
+
+**⚠️ КРИТИЧЕСКО:** При написании теста по тест-кейсу НЕ пропускай preconditions!
+
+**Основные ошибки:**
+- ❌ Эксперименты/фичи из precondition → забыл добавить `.header()`
+- ❌ Параметры из шага → не все добавлены
+- ❌ Неправильный RequestSpec (без токена, когда нужен)
+
+**Подробный алгоритм, чек-лист и примеры:** → см. **[references/testcases.md](references/testcases.md)**
+
+**Краткая справка:**
+| Precondition | Реализация |
+|--------------|------------|
+| Эксперимент включён | `.header("x-vkusvill-ab-tests", "exp=B")` |
+| Пользователь авторизован | `catalogApiWithIntegrationToken()` |
+
+---
+
+## Именование переменных---
 
 ## Именование переменных
 
@@ -211,7 +309,8 @@ GetUser200Response result = userApi()
         .statusCode(200)
         .extract().response());
 
-assertEquals("success", result.getStatus());  // ✅ переменная результата
+assertEquals("success", result.getStatus(),
+    "Статус ответа должен быть 'success'");  // ✅ переменная результата
 
 // НЕПРАВИЛЬНО: Одинаковое имя — затенение переменной
 GetUser200Response response = userApi()
@@ -321,6 +420,15 @@ Error422 result = authApi()
 
 **Правило:** Если у метода есть типизированный `executeAs()` и ожидается статус 200 — **всегда** используй его. Он сразу возвращает нужный тип. Для ошибок используй `execute()` с явным `.statusCode(XXX).extract().body().as(Model.class)`.
 
+**Важно при работе с тест-кейсами:** При выборе метода ориентируйся на **Ожидаемый результат** тест-кейса:
+- Если expected result: "HTTP 200" → используй `executeAs()`
+- Если expected result: "HTTP 422" или другой код ошибки → используй `execute()`
+
+**Precondition тоже влияют на выбор RequestSpec:**
+- Если precondition: "Пользователь НЕ авторизован" → нужен RequestSpec без токена
+- Если precondition: "Пользователь авторизован" → нужен RequestSpec с токеном (`catalogApiWithIntegrationToken()`)
+- Если precondition: "Эксперимент B включён" → нужно добавить `.header("x-vkusvill-ab-tests", "exp=B")`
+
 ### Базовый паттерн (для успешных ответов)
 
 ```java
@@ -358,17 +466,56 @@ ErrorResponse result = api()
 
 ## Проверки
 
-### Примитивы и объекты
+### ⚠️ ОБЯЗАТЕЛЬНО: Добавляй message в ассерты
+
+**Критическое правило:** Все ассерты должны иметь **параметр message** для понятных сообщений об ошибках.
+
+**Зачем нужно:**
+- При падении теста сразу понятно, **что именно** проверялось
+- Не нужно копаться в коде для понимания причины ошибки
+- Ускоряет отладку и анализ падений
+
+**Примеры:**
+
 ```java
+// ❌ НЕПРАВИЛЬНО: Нет message
 assertEquals("success", result.getStatus());
 assertNotNull(result.getBody().getData());
-assertEquals("John", result.getBody().getUser().getName());
+assertEquals(5, result.getBody().getItems().size());
+assertTrue(result.getBody().getTags().isEmpty());
+
+// ✅ ПРАВИЛЬНО: Есть понятный message
+assertEquals("success", result.getStatus(),
+    "Статус ответа должен быть 'success'");
+assertNotNull(result.getBody().getData(),
+    "Поле 'data' не должно быть null");
+assertEquals(5, result.getBody().getItems().size(),
+    "Должно быть 5 элементов в списке items");
+assertTrue(result.getBody().getTags().isEmpty(),
+    "Список тегов должен быть пустым");
+```
+
+**Формат message:**
+- Описывай **что проверяется**, а не какой ожидается результат
+- Используй формат: `"Поле X должно быть Y"` или `"Список X должен содержать Y элементов"`
+- Включай имя проверяемого поля/сущности для контекста
+
+### Примитивы и объекты
+```java
+assertEquals("success", result.getStatus(),
+    "Статус ответа должен быть 'success'");
+assertNotNull(result.getBody().getData(),
+    "Поле 'data' не должно быть null");
+assertEquals("John", result.getBody().getUser().getName(),
+    "Имя пользователя должно быть 'John'");
 ```
 
 ### Collections
 ```java
-assertEquals(5, result.getBody().getItems().size());
-assertTrue(result.getBody().getTags().isEmpty());
+assertEquals(5, result.getBody().getItems().size(),
+    "Должно быть 5 элементов в списке items");
+assertTrue(result.getBody().getTags().isEmpty(),
+    "Список тегов должен быть пустым");
 
 // Поиск элемента
 User user = result.getBody().getUsers().stream()
@@ -379,8 +526,10 @@ User user = result.getBody().getUsers().stream()
 
 ### Nullable
 ```java
-assertNull(result.getBody().getError());
-assertNotNull(result.getBody().getData());
+assertNull(result.getBody().getError(),
+    "Поле 'error' должно быть null");
+assertNotNull(result.getBody().getData(),
+    "Поле 'data' не должно быть null");
 ```
 
 ## Несоответствие Swagger и API
@@ -389,7 +538,8 @@ assertNotNull(result.getBody().getData());
 
 ```java
 // Проверяем только поля из swagger
-assertEquals("success", result.getStatus());
+assertEquals("success", result.getStatus(),
+    "Статус ответа должен быть 'success'");
 
 // TODO: Swagger модель не содержит поле 'metadata'
 ```
