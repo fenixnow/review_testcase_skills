@@ -1,10 +1,11 @@
 {
-  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "vkusvill-qa-skills",
-  "description": "Набор скиллов для ревью и редактирования тест-кейсов в Allure TestOps",
   "owner": {
     "name": "Andrey Poletaev",
     "email": "a.poletaev@automacon.ru"
+  },
+  "metadata": {
+    "description": "Набор скиллов для ревью и редактирования тест-кейсов в Allure TestOps"
   },
   "plugins": [
     {
