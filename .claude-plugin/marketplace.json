@@ -12,22 +12,13 @@
       "name": "tests-skills",
       "description": "Коллекция скиллов для написания автотестов на основе Swagger спецификаций",
       "category": "tests",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./skills/tests-api-swagger"
-      ]
+      "source": "./plugins/tests-skills"
     },
     {
       "name": "testcase-skills",
       "description": "Набор скиллов для ревью тест-кейсов и автоматического редактирования в Allure TestOps",
       "category": "testcase",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./skills/testops-review-testcase",
-        "./skills/testops-edit-testcase"
-      ]
+      "source": "./plugins/testcase-skills"
     }
   ]
 }
