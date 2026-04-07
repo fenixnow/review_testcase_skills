@@ -9,8 +9,8 @@ description: Редактирование предусловия тест-кей
 
 # Входные данные
 
-**testcase_id:** {testcase_id}
-**proposed_edit:** {proposed_edit}
+**testcase_id:** {{testcase_id}}
+**proposed_edit:** {{proposed_edit}}
 
 где:
 - **testcase_id** — ID тест-кейса для изменения

@@ -9,10 +9,10 @@ description: Управление вложениями тест-кейса в Al
 
 # Входные данные
 
-**testcase_id:** {testcase_id}
-**content:** {content}
-**name:** {name}
-**parent_id:** {parent_id}
+**testcase_id:** {{testcase_id}}
+**content:** {{content}}
+**name:** {{name}}
+**parent_id:** {{parent_id}}
 
 где:
 - **testcase_id** — ID тест-кейса для создания вложения
