@@ -19,7 +19,7 @@ def main():
 
     name = "review"
     prompt_content = load_prompt_file("review.md")
-    labels = ["user"]
+    labels = ["user", "api"]
 
     try:
         existing = get_prompt(name, label=labels[0])
