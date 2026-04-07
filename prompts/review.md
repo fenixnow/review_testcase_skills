@@ -30,7 +30,7 @@
 
 **testcase_id:**
 <TESTCASE_ID>
-{testcase_id}
+{{testcase_id}}
 </TESTCASE_ID>
 
 ---

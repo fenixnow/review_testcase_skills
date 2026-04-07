@@ -137,12 +137,12 @@ fixed_sections = [
 
 **testcase_id:**
 <TESTCASE_ID>
-{testcase_id}
+{{testcase_id}}
 </TESTCASE_ID>
 
 **review_result:**
 <REVIEW_RESULT>
-{review_result}
+{{review_result}}
 </REVIEW_RESULT>
 
 # Вызов скиллов
