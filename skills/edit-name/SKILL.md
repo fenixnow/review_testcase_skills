@@ -9,8 +9,16 @@ description: Редактирование имени тест-кейса в Allu
 
 # Входные данные
 
-**testcase_id:** {{testcase_id}}
-**proposed_edit:** {{proposed_edit}}
+**testcase_id:** `{{testcase_id}}`
+
+**proposed_edit:**
+```
+{{proposed_edit}}
+```
+
+где:
+- **testcase_id** — ID тест-кейса для изменения
+- **proposed_edit** — готовый текст секции "1. Имя тест-кейса" для прямого использования
 
 где:
 - **testcase_id** — ID тест-кейса для изменения
