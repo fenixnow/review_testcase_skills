@@ -2,16 +2,12 @@
 
 # Входные данные
 
-<testcase_id>
-{{testcase_id}}
-</testcase_id>
+**testcase_id:** `{{testcase_id}}`
 
-<review_result>
+**review_result:** 
+```
 {{review_result}}
-
-</review_result>
-
----
+```
 
 # Алгоритм действий:
 

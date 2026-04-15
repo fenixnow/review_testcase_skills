@@ -118,9 +118,7 @@ fixed_sections = [
 Если список `fixed_sections` не пуст, добавь в САМЫЙ КОНЕЦ ревью (после "Предлагаемых правок"):
 
 ```
-
 ## Исправлено автоматически
-
 ```
 
 Затем перечисли каждое исправление из `fixed_sections` в том же порядке, в котором они выполнялись.
@@ -135,15 +133,12 @@ fixed_sections = [
 
 # Входные данные
 
-**testcase_id:**
-<TESTCASE_ID>
-{{testcase_id}}
-</TESTCASE_ID>
+**testcase_id:** `{{testcase_id}}`
 
 **review_result:**
-<REVIEW_RESULT>
+```
 {{review_result}}
-</REVIEW_RESULT>
+```
 
 # Вызов скиллов
 
