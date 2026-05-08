@@ -397,6 +397,7 @@ GetUser200Response result = userApi()
 | Ожидаемый статус | Метод | Паттерн |
 |-----------------|-------|---------|
 | **200 (успех)** | `executeAs()` | Типизированный возврат, автоматически десериализует в модель |
+| **200 (нет модели ответа)** | `execute()` | `execute(Validatable::then).statusCode(200)` — когда Swagger не определяет тип ответа |
 | **400, 404, 422, 429 (ошибки)** | `execute()` | Явное указание statusCode и десериализация |
 
 ```java
@@ -453,6 +454,23 @@ ErrorResponse result = api()
     .execute(Validatable::then)
     .statusCode(422)       // код ошибки
     .extract().body().as(ErrorResponse.class);
+```
+
+### Паттерн для нетипизированных ответов (нет модели в Swagger)
+
+Когда Swagger не определяет тип ответа (например, healthcheck эндпоинты), у метода нет `executeAs()`. Используй `execute(Validatable::then).statusCode(200)`.
+
+```java
+// ✅ ПРАВИЛЬНО — нетипизированный ответ
+catalogApi()
+        .healthzGet()
+        .execute(Validatable::then)
+        .statusCode(200);
+
+// ❌ НЕПРАВИЛЬНО — непонятная lambda
+catalogApi()
+        .healthzGet()
+        .execute(responseResult -> responseResult);
 ```
 
 ### Параметры
