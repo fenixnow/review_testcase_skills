@@ -19,6 +19,12 @@
       "description": "Набор скиллов для ревью тест-кейсов и автоматического редактирования в Allure TestOps",
       "category": "testcase",
       "source": "./plugins/testcase-skills"
+    },
+    {
+      "name": "other-skills",
+      "description": "Набор скиллов для разных работ",
+      "category": "other",
+      "source": "./plugins/other-skills"
     }
   ]
 }
